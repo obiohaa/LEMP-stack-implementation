@@ -153,3 +153,8 @@ nginx: configuration file /etc/nginx/nginx.conf test is successful
 - Type or paste the below code into the new file
 
     `<?php phpinfo(); ?>`
+
+- You will see a web page containing detailed information about your server
+
+![NGINX PHP](./images/PHP%20NGINX.PNG)
+
