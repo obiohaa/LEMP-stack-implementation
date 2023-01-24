@@ -158,3 +158,94 @@ nginx: configuration file /etc/nginx/nginx.conf test is successful
 
 ![NGINX PHP](./images/PHP%20NGINX.PNG)
 
+- Lastly we will remove the info.php file as it contains sensitive information about our server.
+
+    `sudo rm /var/www/LEMPproject/info.php`
+
+### **5. RETRIEVING DATA FROM MYSQL DATABASE WITH PHP** ###
+
+Here we will create a test database with simple "To do list"and configure access to it.
+
+- We will create a database called `ebuka_database` and username `ebuka_user`.
+
+    `sudo mysql -u root -p`
+
+    `mysql> CREATE DATABASE 'ebuka_database' `
+
+- Now we will create a user and grant the user full privileges on the database
+
+    `mysql> CREATE USER 'ebuka_user'@'%' IDENTIFIED WITH mysql_native_password BY PassWord.1`
+
+- Now we will give this user permission over ebuka_database
+
+    `mysql> GRANT ALL ON 'ebuka_database.'* TO 'ebuka_user'@'%';`
+
+- This will give the ebuka_user user full privileges over the ebuka_database database, while preventing this user from creating or modifying other databases on your server.
+
+    `mysql> exit`
+
+- Now let us test if the created user can log into the database by typing the below code
+
+    `mysql -u ebuka_user -p`
+
+    `mysql> SHOW DATABASE`
+
+![SHOW DATABASE](./images/SHOW%20DATABASE.PNG)
+
+- Next we will create a test table named ebuka_todo_list
+
+```
+CREATE TABLE ebuka_database.todo_list (
+mysql>     item_id INT AUTO_INCREMENT,
+mysql>     content VARCHAR(255),
+mysql>     PRIMARY KEY(item_id)
+mysql> );
+```
+
+- Insert a few rows of content in the test table
+
+    `mysql> INSERT INTO ebuka_database.todo_list (content) VALUES ("MY FIRST IMPORTANT ITEM")`
+
+- To confirm the data was successfully saved to your table run the below code.
+
+    `mysql> SELECT * FROM ebuka_database.todo_list`;
+
+- You will see the below
+
+    ![DATABASE CONTENT](./images/DATABASE%20CONTENT.PNG)
+
+    `mysql> exit`
+
+- Now you can create a PHP script that will connect to MySQL and query for your content.
+
+    `nano /var/www/LEMPproject/todo_list.php`
+
+- The following PHP script connects to the MySQL database and queries for the content of the todo_list table, displays the results in a list
+
+- Copy the below content into todo_list.php
+
+```
+<?php
+$user = "example_user";
+$password = "password";
+$database = "example_database";
+$table = "todo_list";
+
+try {
+  $db = new PDO("mysql:host=localhost;dbname=$database", $user, $password);
+  echo "<h2>TODO</h2><ol>";
+  foreach($db->query("SELECT content FROM $table") as $row) {
+    echo "<li>" . $row['content'] . "</li>";
+  }
+  echo "</ol>";
+} catch (PDOException $e) {
+    print "Error!: " . $e->getMessage() . "<br/>";
+    die();
+}
+```
+
+- Save and close the file when done editing.
+
+    `http://<public_domain>/todo_list.php`
+
+![NGINX PHP OUTPUT](./images/NGINX%20PHP%20OUTPUT.PNG)
